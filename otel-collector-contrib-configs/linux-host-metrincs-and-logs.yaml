@@ -1,0 +1,46 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+  zpages:
+    endpoint: 0.0.0.0:55679
+
+receivers:
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      disk:
+      filesystem:
+      load:
+      memory:
+      network:
+      paging:
+  filelog:
+    include: [ /var/log/*log ]
+    start_at: end
+
+processors:
+  batch:
+  resourcedetection:
+    detectors: [env, system]
+  cumulativetodelta:
+
+exporters:
+  otlp:
+    endpoint: <IP-or-Endpoint-of-SigNoz-OtelCollector>:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    metrics:
+      receivers: [hostmetrics]
+      processors: [cumulativetodelta, batch, resourcedetection]
+      exporters: [otlp]
+    logs:
+      receivers: [filelog]
+      processors: [batch, resourcedetection]
+      exporters: [otlp]
+
+  extensions: [health_check, pprof, zpages]
