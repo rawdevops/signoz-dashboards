@@ -1,0 +1,39 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+  zpages:
+    endpoint: 0.0.0.0:55679
+
+receivers:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: nginx-vts-metrics
+          scrape_interval: 15s
+          metrics_path: /status/format/prometheus
+          static_configs:
+            - targets: [localhost]
+
+processors:
+  batch:
+  attributes:
+    actions:
+      - key: nginx_service_name
+        value: my-nginx
+        action: insert
+
+exporters:
+  otlp:
+    endpoint: <IP-or-Endpoint-of-SigNoz-OtelCollector>:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus]
+      processors: [batch, attributes]
+      exporters: [otlp]
+
+  extensions: [health_check, pprof, zpages]
