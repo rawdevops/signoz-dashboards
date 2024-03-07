@@ -18,8 +18,8 @@ COPY --from=build-stage /nginx-${NGINX_VERSION}/objs/ngx_http_vhost_traffic_stat
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY default.conf /etc/nginx/conf.d/default.conf
 RUN apt-get update && apt-get install wget -y
-RUN wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.94.0/otelcol_0.94.0_linux_amd64.deb
-RUN dpkg -i otelcol_0.94.0_linux_amd64.deb
+RUN wget https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.94.0/otelcol-contrib_0.94.0_linux_amd64.deb
+RUN dpkg -i otelcol-contrib_0.94.0_linux_amd64.deb
 COPY nginx-module-vts-metrics.yaml /etc/otelcol/config.yaml
 COPY start.sh /start.sh
 RUN chmod +x start.sh
